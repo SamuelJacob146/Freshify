@@ -17,13 +17,24 @@ export default function AuthScreen() {
 
   const handleAuth = async () => {
     try {
+      let userCred;
+  
       if (isRegistering) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        userCred = await createUserWithEmailAndPassword(auth, email, password);
+        console.log('Registered:', userCred.user.email);
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        userCred = await signInWithEmailAndPassword(auth, email, password);
+        console.log('Logged in:', userCred.user.email);
       }
-    } catch (err) {
-      console.log(err);
+  
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Home' }],
+      });
+  
+    } catch (err: any) {
+      console.error('Auth error:', err.message);
+      alert(err.message);
     }
   };
 
@@ -38,6 +49,11 @@ export default function AuthScreen() {
       {email && password && (
         <Text style={styles.error}>
           {isRegistering ? 'Please register with a valid email and password.' : 'Please log in with your email and password.'}
+        </Text>
+      )}
+      {email && !password && (
+        <Text style={styles.error}>
+          {isRegistering ? 'Please register with a password (at least 6 characters).' : 'Please log in with your email and password.'}
         </Text>
       )}
       <Text style={styles.error}>
